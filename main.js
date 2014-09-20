@@ -20,6 +20,7 @@ create: function() {
     // Display the image on the screen 
     game.stage.backgroundColor = '#3498db';
     game.physics.startSystem(Phaser.Physics.ARCADE);
+   
     this.player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
     this.player.anchor.setTo(0.5, 0.5);
     
@@ -32,12 +33,15 @@ create: function() {
     map.addTilesetImage('tileset');
 // Create the layer, by specifying the name of the Tiled layer 
     this.layer = map.createLayer('Tile Layer 1');
+    
+    
+    
 // Set the world size to match the size of the layer 
     this.layer.resizeWorld();
     // Enable collisions for the first element of our tileset (the blue wall) 
-    map.setCollision(1);
-
-    
+   
+    //map.setTileIndexCallback( 1, this.dig, this);
+     map.setCollision(1);
     
     this.cursor = game.input.keyboard.createCursorKeys();
     
@@ -84,31 +88,36 @@ create: function() {
 
 
 },
+    
+
+    
 update: function() { 
     // This function is called 60 times per second 
     // It contains the game's logic 
     
     // Tell Phaser that the player and the walls should collide 
     //game.physics.arcade.collide(this.player, this.walls);
-    game.physics.arcade.collide(this.player, this.layer, this.dig(this.player.x, this.player.y)); 
+    game.physics.arcade.collide(this.player, this.layer, this.dig, null, this); 
 
  
     
     this.movePlayer();
-   
-    
-   // if (!this.player.inWorld) { this.playerDie(); }
-    
-    //game.physics.arcade.overlap(this.player, this.coin, this.takeCoin, null, this);
-    
-    // Make the enemies and walls collide 
-    //game.physics.arcade.collide(this.enemies, this.walls);
-    
-    // Call the 'playerDie' function when the player and an enemy overlap 
-    //game.physics.arcade.overlap(this.player, this.enemies, this.playerDie, null, this);
+
 
 
 },
+
+    
+dig: function (){
+    
+    console.log ("digging");
+    this.emitter.x = this.player.x + this.player.facing_x ; 
+        this.emitter.y = this.player.y + this.player.facing_y ; 
+        this.emitter.start(true, 100, null, 5); 
+        map.removeTile(this.layer.getTileX(this.player.x + this.player.facing_x), this.layer.getTileY(this.player.y + this.player.facing_y));
+        console.log(this.player.facing_x, this.player.facing_y);
+
+},    
     
 movePlayer: function() { 
 // If the left arrow key is pressed
@@ -117,6 +126,8 @@ movePlayer: function() {
         this.player.body.velocity.x = -200; 
         this.player.body.velocity.y = 0; 
         this.player.animations.play('left'); // Start the left animation
+        this.player.facing_x = - ((this.player.width / 2) +1);
+        this.player.facing_y = 0;
 
     }
     
@@ -126,6 +137,9 @@ movePlayer: function() {
         this.player.body.velocity.x = 200;
         this.player.body.velocity.y = 0;
         this.player.animations.play('right'); // Start the right animation
+       
+        this.player.facing_x = (this.player.height / 2) +1;
+        this.player.facing_y = 0;
 
     }
     
@@ -135,6 +149,9 @@ movePlayer: function() {
         this.player.body.velocity.y = -200; 
         this.player.body.velocity.x = 0;
         this.player.animations.play('up'); // Start the right animation
+        
+        this.player.facing_x = 0;
+        this.player.facing_y = - ((this.player.height / 2)+1);
 
     }
     
@@ -144,6 +161,8 @@ movePlayer: function() {
         this.player.body.velocity.y = 200; 
         this.player.body.velocity.x = 0;
         this.player.animations.play('down'); // Start the right animation
+        this.player.facing_x = 0;
+        this.player.facing_y = (this.player.height / 2) + 1;
 
     }
     
@@ -177,14 +196,9 @@ createWorld: function() {
 
 playerDie: function() { 
     game.state.start('main'); 
-},
-    
-dig: function (x, y){
-    console.log ("digging");
-    console.log(x, y);
-    map.swap(1, 3, x, y, 24, 24);
-
 }
+    
+
 
 };
 
