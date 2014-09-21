@@ -25,6 +25,7 @@ create: function() {
     this.player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
     this.player.anchor.setTo(0.5, 0.5);
     this.player.gridPosition = new Phaser.Point(game.world.centerX, game.world.centerY);
+    this.player.facing = [0,0];
     // Tell Phaser that the player will use the Arcade physics engine
     game.physics.arcade.enable(this.player);
     
@@ -35,7 +36,8 @@ create: function() {
 // Create the layer, by specifying the name of the Tiled layer 
     this.layer = map.createLayer('Tile Layer 1');
     
-    
+    this.scoreLabel = game.add.text(10, 10, 'score: 0', { font: '12px Arial', fill: '#ffffff' });
+    this.score = 0;
     
 // Set the world size to match the size of the layer 
     this.layer.resizeWorld();
@@ -43,6 +45,7 @@ create: function() {
    
     //map.setTileIndexCallback( 1, this.dig, this);
      map.setCollision(1);
+    
     
     this.cursor = game.input.keyboard.createCursorKeys();
     
@@ -102,10 +105,11 @@ update: function() {
     //game.physics.arcade.collide(this.player, this.walls);
     game.physics.arcade.collide(this.player, this.layer, this.dig, null, this); 
 
- 
+    this.scoreLabel.text = 'score: ' + this.score;
     
     this.movePlayer();
-
+    
+    console.log(this.player.facing);
 
 
 },
@@ -114,14 +118,15 @@ update: function() {
 dig: function (){
 
     console.log ("digging");
-    this.emitter.x = this.player.x + this.player.facing_x ; 
-        this.emitter.y = this.player.y + this.player.facing_y ; 
+    this.emitter.x = this.player.x + this.player.facing[0] * 13; // cambiare con mezzo player widht +1 
+        this.emitter.y = this.player.y + this.player.facing[1] * 13; //cambiare con mezzo player height +1 
         this.emitter.start(true, 100, null, 5); 
     map.removeTile(this.layer.getTileX(this.emitter.x), this.layer.getTileY(this.emitter.y));
        //map.removeTile(this.layer.getTileX(this.player.x + this.player.facing_x), this.layer.getTileY(this.player.y + this.player.facing_y));
     //this.player.x =this.emitter.x;
     //this.player.y = this.emitter.y;
-        console.log(this.layer.getTileX,this.layer.getTileY);
+        //console.log(this.layer.getTileX,this.layer.getTileY);
+    this.score += 10;
 
 },  
     
@@ -132,47 +137,65 @@ dig: function (){
 movePlayer: function() { 
 // If the left arrow key is pressed
     if ((this.cursor.left.isDown || this.wasd.left.isDown)) { 
+        if (this.player.facing[0] != -1 || this.player.facing[1] != 0){ //TODO: non va
+            this.player.facing = [-1,0];
+            this.playerSnapToGrid();
+        }
         // Move the player to the left 
         this.player.body.velocity.x = -200; 
         this.player.body.velocity.y = 0; 
         //this.placePlayer(1,0);
         this.player.animations.play('left'); // Start the left animation
-        this.player.facing_x = - ((this.player.width / 2) +1);
-        this.player.facing_y = 0;
+        
+        //this.player.facing_x = - ((this.player.width / 2) +1); //migliorare con array e 0 e 1
+        //this.player.facing_y = 0;
     }
     
     // If the right arrow key is pressed 
     else if (this.cursor.right.isDown || this.wasd.right.isDown) { 
+        if (this.player.facing[0] != 1 || this.player.facing[1] != 0){
+            this.player.facing = [1,0];
+            this.playerSnapToGrid();
+        }
         // Move the player to the right 
         this.player.body.velocity.x = 200;
         this.player.body.velocity.y = 0;
         this.player.animations.play('right'); // Start the right animation
-       
-        this.player.facing_x = (this.player.height / 2) +1;
-        this.player.facing_y = 0;
+        
+        //this.player.facing_x = (this.player.height / 2) +1;
+        //this.player.facing_y = 0;
 
     }
     
         // If the up arrow key is pressed 
     else if (this.cursor.up.isDown || this.wasd.up.isDown) { 
+        if (this.player.facing[0] != 0 || this.player.facing[1] != -1){
+            this.player.facing = [0,-1];
+            this.playerSnapToGrid();
+        }
         // Move the player to the right 
         this.player.body.velocity.y = -200; 
         this.player.body.velocity.x = 0;
         this.player.animations.play('up'); // Start the right animation
         
-        this.player.facing_x = 0;
-        this.player.facing_y = - ((this.player.height / 2)+1);
+        //this.player.facing_x = 0;
+        //this.player.facing_y = - ((this.player.height / 2)+1);
 
     }
     
             // If the down arrow key is pressed 
     else if (this.cursor.down.isDown || this.wasd.down.isDown) { 
+        if (this.player.facing[0] != 0 || this.player.facing[1] != 1){ 
+            this.player.facing =[0,1];
+            this.playerSnapToGrid();
+        }
         // Move the player to the right 
         this.player.body.velocity.y = 200; 
         this.player.body.velocity.x = 0;
         this.player.animations.play('down'); // Start the right animation
-        this.player.facing_x = 0;
-        this.player.facing_y = (this.player.height / 2) + 1;
+        
+        //this.player.facing_x = 0;
+        //this.player.facing_y = (this.player.height / 2) + 1;
         
     }
     
