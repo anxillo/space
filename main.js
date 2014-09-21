@@ -109,15 +109,20 @@ update: function() {
 
     
 dig: function (){
-    
+
     console.log ("digging");
     this.emitter.x = this.player.x + this.player.facing_x ; 
         this.emitter.y = this.player.y + this.player.facing_y ; 
         this.emitter.start(true, 100, null, 5); 
-        map.removeTile(this.layer.getTileX(this.player.x + this.player.facing_x), this.layer.getTileY(this.player.y + this.player.facing_y));
-        console.log(this.player.facing_x, this.player.facing_y);
+    map.removeTile(this.layer.getTileX(this.emitter.x), this.layer.getTileY(this.emitter.y));
+       //map.removeTile(this.layer.getTileX(this.player.x + this.player.facing_x), this.layer.getTileY(this.player.y + this.player.facing_y));
+    //this.player.x =this.emitter.x;
+    //this.player.y = this.emitter.y;
+        console.log(this.layer.getTileX,this.layer.getTileY);
 
 },    
+
+
     
 movePlayer: function() { 
 // If the left arrow key is pressed
@@ -213,7 +218,7 @@ playerDie: function() {
 
 
 // We initialising Phaser 
-var game = new Phaser.Game(480, 480, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(504, 504, Phaser.AUTO, 'gameDiv');
 
 
 // And finally we tell Phaser to add and start our 'main' state 
