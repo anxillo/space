@@ -1,3 +1,4 @@
+
 // We create our only state 
 var mainState = {
     
@@ -23,7 +24,7 @@ create: function() {
    
     this.player = game.add.sprite(game.world.centerX, game.world.centerY, 'player');
     this.player.anchor.setTo(0.5, 0.5);
-    
+    this.player.gridPosition = new Phaser.Point(game.world.centerX, game.world.centerY);
     // Tell Phaser that the player will use the Arcade physics engine
     game.physics.arcade.enable(this.player);
     
@@ -48,6 +49,8 @@ create: function() {
     //this.createWorld();
     
     game.input.keyboard.addKeyCapture([Phaser.Keyboard.UP, Phaser.Keyboard.DOWN, Phaser.Keyboard.LEFT, Phaser.Keyboard.RIGHT, Phaser.Keyboard.SPACEBAR]);
+    
+
 
     this.wasd = { 
         up: game.input.keyboard.addKey(Phaser.Keyboard.W), 
@@ -120,7 +123,9 @@ dig: function (){
     //this.player.y = this.emitter.y;
         console.log(this.layer.getTileX,this.layer.getTileY);
 
-},    
+},  
+    
+
 
 
     
@@ -130,10 +135,10 @@ movePlayer: function() {
         // Move the player to the left 
         this.player.body.velocity.x = -200; 
         this.player.body.velocity.y = 0; 
+        //this.placePlayer(1,0);
         this.player.animations.play('left'); // Start the left animation
         this.player.facing_x = - ((this.player.width / 2) +1);
         this.player.facing_y = 0;
-
     }
     
     // If the right arrow key is pressed 
@@ -168,7 +173,7 @@ movePlayer: function() {
         this.player.animations.play('down'); // Start the right animation
         this.player.facing_x = 0;
         this.player.facing_y = (this.player.height / 2) + 1;
-
+        
     }
     
                 // If the space key is pressed 
@@ -179,7 +184,7 @@ movePlayer: function() {
         this.emitter.x = this.player.x+13; 
         this.emitter.y = this.player.y; 
         this.emitter.start(true, 100, null, 5); 
-
+        
     }
     
     // If neither the right or left arrow key is pressed 
@@ -188,11 +193,19 @@ movePlayer: function() {
         this.player.body.velocity.x = 0; 
         this.player.body.velocity.y = 0; 
         this.player.animations.stop(); // Stop the animation 
+        console.log(this.layer.getTileX(this.player.x), this.layer.getTileY(this.player.y));
+        this.playerSnapToGrid();
         //this.player.frame = 3; 
     }
     
 
     
+},
+  
+playerSnapToGrid: function (){
+    this.player.x = this.layer.getTileX(this.player.x) *24 +12; //TODO: sostituire con valori non fissi dim casella e mezzo dim player
+    this.player.y = this.layer.getTileX(this.player.y) *24 +12; //TODO: sostituire con valori non fissi dim casella e mezzo dim player
+      
 },
 
 createWorld: function() { 
