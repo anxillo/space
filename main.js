@@ -17,6 +17,8 @@ preload: function() {
 
 
 },
+    
+    
 create: function() { 
     // Display the image on the screen 
     game.stage.backgroundColor = '#3498db';
@@ -26,6 +28,7 @@ create: function() {
     this.player.anchor.setTo(0.5, 0.5);
     this.player.gridPosition = new Phaser.Point(game.world.centerX, game.world.centerY);
     this.player.facing = [0,0];
+    this.player.tempo = 0;
     // Tell Phaser that the player will use the Arcade physics engine
     game.physics.arcade.enable(this.player);
     
@@ -92,7 +95,16 @@ create: function() {
     // Use no gravity for the particles 
     this.emitter.gravity = 100;
 
+    //  Create our Timer
+    timer = game.time.create(false);
 
+    //  Set a TimerEvent to occur after 2 seconds
+    timer.loop(1000, this.updateCounter, this);
+
+    //  Start the timer running - this is important!
+    //  It won't start automatically, allowing you to hook it to button events and the like.
+    timer.start();
+    
 },
     
 
@@ -103,15 +115,25 @@ update: function() {
     
     // Tell Phaser that the player and the walls should collide 
     //game.physics.arcade.collide(this.player, this.walls);
+    
     game.physics.arcade.collide(this.player, this.layer, this.dig, null, this); 
 
     this.scoreLabel.text = 'score: ' + this.score;
     
     this.movePlayer();
     
-    console.log(this.player.facing);
+    console.log(this.player.tempo);
 
 
+},
+
+updateCounter: function(){
+    console.log(this.player.tempo);
+    this.player.tempo ++;
+    if (this.player.tempo == 3){
+        this.player.tempo =0;      
+    }
+    
 },
 
     
@@ -121,12 +143,18 @@ dig: function (){
     this.emitter.x = this.player.x + this.player.facing[0] * 13; // cambiare con mezzo player widht +1 
         this.emitter.y = this.player.y + this.player.facing[1] * 13; //cambiare con mezzo player height +1 
         this.emitter.start(true, 100, null, 5); 
-    map.removeTile(this.layer.getTileX(this.emitter.x), this.layer.getTileY(this.emitter.y));
+    if (this.player.tempo ==1){
+        map.replace(1,2, this.layer.getTileX(this.emitter.x), this.layer.getTileY(this.emitter.y),this.layer);
+    }
+    if (this.player.tempo == 2){
+        map.removeTile(this.layer.getTileX(this.emitter.x), this.layer.getTileY(this.emitter.y));
+        this.player.tempo =0;
+    }
        //map.removeTile(this.layer.getTileX(this.player.x + this.player.facing_x), this.layer.getTileY(this.player.y + this.player.facing_y));
     //this.player.x =this.emitter.x;
     //this.player.y = this.emitter.y;
         //console.log(this.layer.getTileX,this.layer.getTileY);
-    this.score += 10;
+    //this.score += 10;
 
 },  
     
